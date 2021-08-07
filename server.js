@@ -23,6 +23,7 @@ console.log(`Using event hub consumer group [${eventHubConsumerGroup}]`);
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res /* , next */) => {
+  console.log("REDIRECTED")
   res.redirect('/');
 });
 
