@@ -1,36 +1,36 @@
-// const { Connection, Request, TYPES } = require("tedious");
+const { Connection, Request, TYPES } = require("tedious");
 
-// function connectToDatabase(){
-//     const config = {
-//         authentication: {
-//         options: {
-//             userName: process.env.SQLUsername, 
-//             password: process.env.SQLPassword,
-//         },
-//         type: "default"
-//         },
-//         server: process.env.AzureServerString, 
-//         options: {
-//         database: process.env.AzureDatabaseName, 
-//         encrypt: true
-//         }
-//     };
+function connectToDatabase(){
+    const config = {
+        authentication: {
+        options: {
+            userName: process.env.SQLUsername, 
+            password: process.env.SQLPassword,
+        },
+        type: "default"
+        },
+        server: process.env.AzureServerString, 
+        options: {
+        database: process.env.AzureDatabaseName, 
+        encrypt: true
+        }
+    };
 
-//     const connection = new Connection(config);    
-//     return new Promise((resolve, reject) => {
-//         var connection = new Connection(config);
+    const connection = new Connection(config);    
+    return new Promise((resolve, reject) => {
+        var connection = new Connection(config);
     
-//         connection.on('connect', function(err) {
-//             if (err){
-//                 return reject(err);
-//             } 
+        connection.on('connect', function(err) {
+            if (err){
+                return reject(err);
+            } 
                         
-//             resolve(connection);
-//         });
+            resolve(connection);
+        });
 
-//         connection.connect();
-//     });
-// }
+        connection.connect();
+    });
+}
 
 // function insertTelemetryData(connection, timestamp, temperature){
 
@@ -77,6 +77,6 @@
 
 // }
 
-// module.exports = {
-//     connectToDatabase, insertTelemetryData, getLastAddedTemperature
-// }
+module.exports = {
+    connectToDatabase
+}

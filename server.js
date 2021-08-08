@@ -3,13 +3,13 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const EventHubReader = require('./scripts/event-hub-reader.js');
-// const { connectToDatabase, insertTelemetryData, getLastAddedTemperature } = require('./scripts/data-base-manager.js')
+ const { connectToDatabase } = require('./scripts/data-base-manager.js')
 
-// let dbConnection;
-// connectToDatabase().then(
-//   result => dbConnection = result,
-//   error => console.log("No connection with DB possible! " + error)
-// );
+let dbConnection;
+connectToDatabase().then(
+  result => dbConnection = result,
+  error => console.log("No connection with DB possible! " + error)
+);
 
 const iotHubConnectionString = process.env.IotHubConnectionString;
 if (!iotHubConnectionString) {
