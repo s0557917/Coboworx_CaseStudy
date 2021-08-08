@@ -5,7 +5,7 @@ body{
 .vertically-aligned-text{
   display: flex;
   justify-content: center;
-  align-items: center;        /* for single line flex container */
+  align-items: center;        
   font-size: 3em;
 }
 
@@ -14,9 +14,9 @@ body{
   margin: 30px;
   height: 200px;
 
-  display: flex;           /* establish flex container */
-  flex-direction: column;  /* make main axis vertical */
-  justify-content: center; /* center items vertically, in this case */
+  display: flex;           
+  flex-direction: column;  
+  justify-content: center; 
   align-items: center;
 }
 
@@ -67,8 +67,8 @@ body{
   box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
   border-radius: 5px;
 
-  display: flex;           /* establish flex container */
-  flex-direction: column;  /* make main axis vertical */
-  justify-content: center; /* center items vertically, in this case */
+  display: flex;           
+  flex-direction: column;  
+  justify-content: center; 
   align-items: center;
 }
