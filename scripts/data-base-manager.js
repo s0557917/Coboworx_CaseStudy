@@ -32,24 +32,24 @@ function connectToDatabase(){
     });
 }
 
-// function insertTelemetryData(connection, timestamp, temperature){
+function insertTelemetryData(connection, timestamp, temperature){
 
-//     const insertionRequest = new Request(
-//         `INSERT INTO TelemetryData (Timestamp, Temperature) VALUES (@timestamp, @temperature)`,
-//         (err, rowCount) => {
-//           if (err) 
-//           {
-//             console.error(err.message);
-//           } else 
-//           {
-//             console.log("Succesfull SQL insertion");
-//           }
-//         }
-//     );
-//     insertionRequest.addParameter('timestamp', TYPES.DateTime2, new Date(timestamp));
-//     insertionRequest.addParameter('temperature', TYPES.Decimal, temperature);
-//     connection.execSql(insertionRequest);
-// }
+    const insertionRequest = new Request(
+        `INSERT INTO TelemetryData (Timestamp, Temperature) VALUES (@timestamp, @temperature)`,
+        (err, rowCount) => {
+          if (err) 
+          {
+            console.error(err.message);
+          } else 
+          {
+            console.log("Succesfull SQL insertion");
+          }
+        }
+    );
+    insertionRequest.addParameter('timestamp', TYPES.DateTime2, new Date(timestamp));
+    insertionRequest.addParameter('temperature', TYPES.Decimal, temperature);
+    connection.execSql(insertionRequest);
+}
 
 // function getLastAddedTemperature(connection){
 //     return new Promise((resolve, reject) => {

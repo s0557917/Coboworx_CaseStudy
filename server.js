@@ -66,7 +66,7 @@ const eventHubReader = new EventHubReader(iotHubConnectionString, eventHubConsum
         MessageDate: date || Date.now().toISOString(),
         DeviceId: deviceId,
       };
-      // insertTelemetryData(dbConnection, date, message.temperature);
+      insertTelemetryData(dbConnection, date, message.temperature);
       wss.broadcast(JSON.stringify(payload));
     } catch (err) {
       console.error('Error broadcasting: [%s] from [%s].', err, message);
