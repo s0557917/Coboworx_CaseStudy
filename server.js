@@ -3,7 +3,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const EventHubReader = require('./scripts/event-hub-reader.js');
- const { connectToDatabase } = require('./scripts/data-base-manager.js')
+ const { connectToDatabase, insertTelemetryData } = require('./scripts/data-base-manager.js')
 
 let dbConnection;
 connectToDatabase().then(

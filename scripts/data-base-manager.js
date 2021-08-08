@@ -78,5 +78,5 @@ function insertTelemetryData(connection, timestamp, temperature){
 // }
 
 module.exports = {
-    connectToDatabase
+    connectToDatabase, insertTelemetryData
 }
