@@ -3,7 +3,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const EventHubReader = require('./scripts/event-hub-reader.js');
- const { connectToDatabase, insertTelemetryData } = require('./scripts/data-base-manager.js')
+ const { connectToDatabase, insertTelemetryData, getLastAddedTemperature, getTemperatureAverageFromLastDay } = require('./scripts/data-base-manager.js')
 
 let dbConnection;
 connectToDatabase().then(
@@ -49,12 +49,21 @@ server.listen(process.env.PORT || '3000', () => {
   console.log('Listening on %d.', server.address().port);
 });
 
-// wss.on('connection', function(ws, request){
-//   getLastAddedTemperature(dbConnection).then(
-//     result => wss.broadcast(result),
-//     error => console.log("Not possible to get last recorded temperature! " + error)
-//   );
-// });
+wss.on('connection', function(ws, request){
+  getLastAddedTemperature(dbConnection).then(
+    result => {
+      wss.broadcast(result);
+      getTemperatureAverageFromLastDay(dbConnection).then(
+        result => {
+          wss.broadcast(result);
+        },
+        error => console.log("Could not get average temperature! " + error)
+      );
+    },
+    error => console.log("Could not get average temperature! " + error)
+  );
+
+});
 
 const eventHubReader = new EventHubReader(iotHubConnectionString, eventHubConsumerGroup);
 

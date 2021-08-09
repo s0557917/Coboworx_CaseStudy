@@ -11,8 +11,9 @@ function connectToDatabase(){
         },
         server: process.env.AzureServerString, 
         options: {
-        database: process.env.AzureDatabaseName, 
-        encrypt: true
+            database: process.env.AzureDatabaseName, 
+            encrypt: true, 
+            rowCollectionOnDone: true
         }
     };
 
@@ -51,32 +52,44 @@ function insertTelemetryData(connection, timestamp, temperature){
     connection.execSql(insertionRequest);
 }
 
-// function getLastAddedTemperature(connection){
-//     return new Promise((resolve, reject) => {
-//         const request = new Request(
-//             `SELECT temperature FROM TelemetryData WHERE timestamp = (SELECT MAX(timestamp) FROM TelemetryData)`,
-//             (error, rowCount, rows) => {
-//                 if (error) {
-//                     return reject(error);
-//                 }
-//             }
-//         );
+function getLastAddedTemperature(connection){
+    return new Promise((resolve, reject) => {
+        const request = new Request(
+            `SELECT temperature FROM TelemetryData WHERE timestamp = (SELECT MAX(timestamp) FROM TelemetryData)`,
+            (error, rowCount, rows) => {
+                if (error) {
+                    return reject(error);
+                }
+            }
+        ).on('doneInProc', function(rowCount, more, rows)
+        {
+            resolve(JSON.stringify({LatestTemperature: rows[0].value}));
+        });
+        connection.execSql(request);
+    });
+}
 
-//         request.on('row', function (columns) {
-//             if(!columns[0].value){
-//                 return reject();
-//             }
-
-//             resolve(JSON.stringify({LatestTemperature: columns[0].value}));
-//         });
-//         connection.execSql(request);
-//     });
-// }
-
-// function getTemperaturesFromLastDay(){
-
-// }
+function getTemperatureAverageFromLastDay(connection){
+    return new Promise((resolve, reject) => {
+        const request = new Request(
+            `SELECT temperature FROM TelemetryData WHERE timestamp >= DATEADD(day, -1, GETDATE())`,
+            (error, rowCount, rows) => 
+            {
+                if (error) 
+                {
+                    return reject(error);
+                }
+            }
+        ).on('doneInProc', function(rowCount, more, rows)
+        {
+            let average = rows.map(a => a[0].value).reduce((a,b) => a + b, 0)/rowCount;
+            resolve(JSON.stringify({TemperatureAverage: average}));
+        });
+        
+        connection.execSql(request);
+    });
+}
 
 module.exports = {
-    connectToDatabase, insertTelemetryData
+    connectToDatabase, insertTelemetryData, getLastAddedTemperature, getTemperatureAverageFromLastDay
 }
