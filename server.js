@@ -4,13 +4,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const EventHubReader = require('./scripts/event-hub-reader.js');
-const { connectToDatabase, insertTelemetryData, getLastAddedTemperature, getTemperatureAverageFromLastDay, establishDBConnection, runGetLatestTemperatureQuery, runGetTemperatureAverageFromLastDay, runTelemetryInsertionQuery } = require('./scripts/data-base-manager.js')
-
-// let dbConnection;
-// connectToDatabase().then(
-//   result => dbConnection = result,
-//   error => console.error("No connection with DB possible! " + error)
-// );
+const { runGetLatestTemperatureQuery, runGetTemperatureAverageFromLastDay, runTelemetryInsertionQuery } = require('./scripts/data-base-manager.js')
 
 const iotHubConnectionString = process.env.IOT_HUB_CONNECTION_STRING;
 if (!iotHubConnectionString) 
@@ -58,36 +52,11 @@ server.listen(process.env.PORT || '3000', () =>
   console.log('Listening on %d.', server.address().port);
 });
 
-runGetLatestTemperatureQuery().then(value => {
-  if(value)
-  {
-    const latestTemperature = 
-    {
-      LatestTemperature: value.recordset[0].temperature
-    }
-    wss.broadcast(JSON.stringify(latestTemperature));
-    console.log("RETURNED TEMP: ", JSON.stringify(latestTemperature));
-  }
-});
-
-runGetTemperatureAverageFromLastDay().then(value => {
-  if(value)
-  {
-    let average = 0;
-    for(let i=0; i<value.recordset.length; i++){
-      average += value.recordset[i].temperature;
-    }
-
-    average = average / value.recordset.length;
-    const temperatureAverage = {
-      TemperatureAverage: average
-    }
-    wss.broadcast(JSON.stringify(temperatureAverage));
-    console.log("RETURNED AVG: ", JSON.stringify(temperatureAverage));
-  }
-});
-
 const eventHubReader = new EventHubReader(iotHubConnectionString, eventHubConsumerGroup);
+
+wss.on('connection', function(ws, request){
+  getAndBroadcastTemperatureData();
+});
 
 (async () => 
 {
@@ -95,15 +64,9 @@ const eventHubReader = new EventHubReader(iotHubConnectionString, eventHubConsum
   {
     try 
     {
-      const payload = 
-      {
-        IotData: message,
-        MessageDate: date || Date.now().toISOString(),
-        DeviceId: deviceId,
-      };
-
-      runTelemetryInsertionQuery(date, message.temperature);
-      wss.broadcast(JSON.stringify(payload));
+      runTelemetryInsertionQuery(date, parseFloat(message.temperature)).then(() => {
+        getAndBroadcastTemperatureData();
+      });
 
     } catch (err) 
     {
@@ -111,3 +74,29 @@ const eventHubReader = new EventHubReader(iotHubConnectionString, eventHubConsum
     }
   });
 })().catch();
+
+function getAndBroadcastTemperatureData(){
+  runGetLatestTemperatureQuery().then(value => {
+    if(value)
+    {
+      wss.broadcast(JSON.stringify({ LatestTemperature: value.recordset[0].temperature }));
+    }
+  });
+  
+  runGetTemperatureAverageFromLastDay().then(value => {
+    if(value)
+    {
+      average = calculateTemperatureAverage(value);
+      wss.broadcast(JSON.stringify({TemperatureAverage: average}));
+    }
+  });
+}
+
+function calculateTemperatureAverage(temperatures){
+  let average = 0;
+  for(let i=0; i<temperatures.recordset.length; i++){
+    average += temperatures.recordset[i].temperature;
+  }
+  average = average / temperatures.recordset.length;
+  return average;
+}

@@ -18,9 +18,8 @@ $(document).ready(() =>
     {
         try 
         {
-            console.log("MESSAGE: ", message);
             const messageData = JSON.parse(message.data);
-            console.log("MESSAGE DATA: ", messageData);
+
             if(messageData.LatestTemperature)
             {
                 currentTemperature = parseFloat(messageData.LatestTemperature);
