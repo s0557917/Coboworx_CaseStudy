@@ -48,12 +48,12 @@ $(document).ready(() =>
     {
         if(parseFloat(currentTemperature) < maximalTemperature)
         {
-            temperatureStatusText.innerHTML = "STATUS: OK";
+            temperatureStatusText.innerHTML = "Status: Ok!";
             temperatureStatusDiv.className = "ok";
         }
         else
         {
-            temperatureStatusText.innerHTML = "STATUS: TOO HOT!";
+            temperatureStatusText.innerHTML = "Status: Too Hot!";
             temperatureStatusDiv.className = "bad";
         }
     }
