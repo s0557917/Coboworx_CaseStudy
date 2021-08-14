@@ -1,95 +1,122 @@
-const { Connection, Request, TYPES } = require("tedious");
+require('dotenv').config();
+const sql = require('mssql');
+let connectionPool;
+let connection;
+const sqlConfig = 
+{
+    user: process.env.SQL_USERNAME,
+    password: process.env.SQL_PASSWORD,
+    database: process.env.AZURE_DATABASE_NAME,
+    server: process.env.AZURE_SERVER_STRING,
+    pool: 
+    {
+        max: 10,
+        min: 0,
+        idleTimeoutMillis: 30000
+    },
+    options: 
+    {
+        encrypt: true, 
+        trustServerCertificate: true 
+    }
+};
 
-function connectToDatabase(){
-    const config = {
-        authentication: {
-        options: {
-            userName: process.env.SQLUsername, 
-            password: process.env.SQLPassword,
-        },
-        type: "default"
-        },
-        server: process.env.AzureServerString, 
-        options: {
-            database: process.env.AzureDatabaseName, 
-            encrypt: true, 
-            rowCollectionOnDone: true
-        }
-    };
-
-    const connection = new Connection(config);    
-    return new Promise((resolve, reject) => {
-        var connection = new Connection(config);
-    
-        connection.on('connect', function(err) {
-            if (err){
-                return reject(err);
-            } 
-                        
-            resolve(connection);
-        });
-
-        connection.connect();
-    });
+function establishDBConnection()
+{
+    connectionPool = new sql.ConnectionPool(sqlConfig);
+    connection = connectionPool.connect();
 }
 
-function insertTelemetryData(connection, timestamp, temperature){
+async function runTelemetryInsertionQuery(timestamp, temperature)
+{
+    try
+    {
+        let pool = await sql.connect(sqlConfig);
+        return pool.request()
+        .input('timestamp', sql.DateTime2, timestamp)
+        .input('temperature', sql.Decimal, temperature)
+        .query(`INSERT INTO TelemetryData (Timestamp, Temperature) VALUES (@timestamp, @temperature)`);
+    }
+    catch (error)
+    {
+        console.error(error);
+    }
 
-    const insertionRequest = new Request(
-        `INSERT INTO TelemetryData (Timestamp, Temperature) VALUES (@timestamp, @temperature)`,
-        (err, rowCount) => {
-          if (err) 
-          {
-            console.error(err.message);
-          } else 
-          {
-            console.log("Succesfull SQL insertion");
-          }
-        }
-    );
-    insertionRequest.addParameter('timestamp', TYPES.DateTime2, new Date(timestamp));
-    insertionRequest.addParameter('temperature', TYPES.Decimal, temperature);
-    connection.execSql(insertionRequest);
+    // sql.connect(sqlConfig).then(pool => {      
+    //     pool.request()
+    //     .input('timestamp', sql.DateTime2, timestamp)
+    //     .input('temperature', sql.Decimal, temperature)
+    //     .query(`INSERT INTO TelemetryData (Timestamp, Temperature) VALUES (@timestamp, @temperature)`)
+    // }).then(result => {
+    //     console.log("Succesfull SQL insertion");
+    // }).catch(error => {
+    //     reject(error);
+    // });
 }
 
-function getLastAddedTemperature(connection){
-    return new Promise((resolve, reject) => {
-        const request = new Request(
-            `SELECT temperature FROM TelemetryData WHERE timestamp = (SELECT MAX(timestamp) FROM TelemetryData)`,
-            (error, rowCount, rows) => {
-                if (error) {
-                    return reject(error);
-                }
-            }
-        ).on('doneInProc', function(rowCount, more, rows)
-        {
-            resolve(JSON.stringify({LatestTemperature: rows[0].value}));
-        });
-        connection.execSql(request);
-    });
+async function runGetLatestTemperatureQuery()
+{  
+    try
+    {
+        let pool = await sql.connect(sqlConfig);
+        return pool.request().query(`SELECT temperature FROM TelemetryData WHERE timestamp = (SELECT MAX(timestamp) FROM TelemetryData)`);
+    }
+    catch(error)
+    {
+        console.error(error);
+    }
 }
 
-function getTemperatureAverageFromLastDay(connection){
-    return new Promise((resolve, reject) => {
-        const request = new Request(
-            `SELECT temperature FROM TelemetryData WHERE timestamp >= DATEADD(day, -1, GETDATE())`,
-            (error, rowCount, rows) => 
-            {
-                if (error) 
-                {
-                    return reject(error);
-                }
-            }
-        ).on('doneInProc', function(rowCount, more, rows)
-        {
-            let average = rows.map(a => a[0].value).reduce((a,b) => a + b, 0)/rowCount;
-            resolve(JSON.stringify({TemperatureAverage: average}));
-        });
-        
-        connection.execSql(request);
-    });
+// function insertTelemetryData(connection, timestamp, temperature)
+// {
+
+//     return new Promise((resolve, reject) => 
+//     {
+//         const insertionRequest = new Request
+//         (
+//             `INSERT INTO TelemetryData (Timestamp, Temperature) VALUES (@timestamp, @temperature)`,
+//             (err, rowCount) => 
+//             {
+//                 if (error) 
+//                 {
+//                     reject(error);
+//                 }
+//             }
+//         ).on('doneInProc', function(errors, rowCount, row)
+//         {
+//             if(errors)
+//             {
+//                 reject(errors);
+//             }
+//             else 
+//             {
+//                 resolve();
+//             }
+//         });
+//         insertionRequest.addParameter('timestamp', TYPES.DateTime2, new Date(timestamp));
+//         insertionRequest.addParameter('temperature', TYPES.Decimal, temperature);
+//         connection.execSql(insertionRequest);
+//     });
+// }
+
+
+async function runGetTemperatureAverageFromLastDay(connection)
+{
+    try
+    {
+        let pool = await sql.connect(sqlConfig);
+        return pool.request().query(`SELECT temperature FROM TelemetryData WHERE timestamp >= DATEADD(day, -20, GETDATE())`);
+    }
+    catch(error)
+    {
+        console.error(error);
+    }
 }
 
-module.exports = {
-    connectToDatabase, insertTelemetryData, getLastAddedTemperature, getTemperatureAverageFromLastDay
+module.exports = 
+{
+    establishDBConnection, 
+    runGetLatestTemperatureQuery,
+    runTelemetryInsertionQuery, 
+    runGetTemperatureAverageFromLastDay
 }

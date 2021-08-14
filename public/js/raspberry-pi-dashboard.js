@@ -18,47 +18,20 @@ $(document).ready(() =>
     {
         try 
         {
+            console.log("MESSAGE: ", message);
             const messageData = JSON.parse(message.data);
-
+            console.log("MESSAGE DATA: ", messageData);
             if(messageData.LatestTemperature)
             {
                 currentTemperature = parseFloat(messageData.LatestTemperature);
 
                 updateCurrentTemperature(currentTemperature);
                 updateTemperatureStatus(currentTemperature);
-
             }
-            else if(messageData.TemperatureAverage)
+             
+            if(messageData.TemperatureAverage)
             {
                 updateTemperatureAverage(parseFloat(messageData.TemperatureAverage))
-            }
-            else if (!messageData.MessageDate || (!messageData.IotData.temperature && !messageData.IotData.humidity)) {
-                return;
-            }
-            
-            currentTemperature = parseFloat(messageData.IotData.temperature);
-
-            if(messageData.IotData.temperature)
-            {
-                currentTemperatureText.innerHTML = Math.floor(currentTemperature * 100) / 100 + " °C";
-                
-                if(parseFloat(messageData.IotData.temperature) < maximalTemperature)
-                {
-                    temperatureStatusText.innerHTML = "STATUS: OK";
-                    temperatureStatusDiv.className = "ok";
-                }
-                else
-                {
-                    temperatureStatusText.innerHTML = "STATUS: TOO HOT!";
-                    temperatureStatusDiv.className = "bad";
-                }
-            }
-            else
-            {
-                currentTemperatureText.innerHTML = "N/A";
-                currentTemperatureText.class = "neutral"
-                temperatureStatusDiv.innerHTML = "N/A";
-                temperatureStatusDiv.class = "neutral"
             }
         } 
         catch (err) 
