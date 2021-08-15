@@ -75,26 +75,46 @@ wss.on('connection', function(ws, request){
   });
 })().catch();
 
-function getAndBroadcastTemperatureData(){
-  runGetLatestTemperatureQuery().then(value => {
+function getAndBroadcastTemperatureData()
+{
+
+  let latestTemperature;
+  let avgTemperature;
+
+  runGetLatestTemperatureQuery().then(value => 
+  {
     if(value)
     {
-      wss.broadcast(JSON.stringify({ LatestTemperature: value.recordset[0].temperature }));
-    }
-  });
-  
-  runGetTemperatureAverageFromLastDay().then(value => {
-    if(value)
-    {
-      average = calculateTemperatureAverage(value);
-      wss.broadcast(JSON.stringify({TemperatureAverage: average}));
+      latestTemperature = value.recordset[0].temperature;
+
+      runGetTemperatureAverageFromLastDay().then(value => 
+      {
+        if(value)
+        {
+          avgTemperature = calculateTemperatureAverage(value);
+        }
+        else
+        {
+          avgTemperature = null;
+        }
+
+        wss.broadcast(JSON.stringify
+        (
+          {
+            LatestTemperature: latestTemperature,
+            TemperatureAverage: avgTemperature
+          }
+        ));
+      });
     }
   });
 }
 
-function calculateTemperatureAverage(temperatures){
+function calculateTemperatureAverage(temperatures)
+{
   let average = 0;
-  for(let i=0; i<temperatures.recordset.length; i++){
+  for(let i=0; i<temperatures.recordset.length; i++)
+  {
     average += temperatures.recordset[i].temperature;
   }
   average = average / temperatures.recordset.length;

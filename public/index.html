@@ -2,12 +2,10 @@
 
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <script src="https://code.jquery.com/jquery-3.4.0.min.js" integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous" type="text/javascript" charset="utf-8"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js" type="text/javascript" charset="utf-8"></script> -->
     <script src="js/raspberry-pi-dashboard.js" type="text/javascript" charset="utf-8"></script>
     <link href="css/style.css" rel="stylesheet" />
 
@@ -16,22 +14,27 @@
 
 <body>
 
-    <h1 id="header">RaspberryPi Dashboard</h1>
+    <div id="loading-screen">
+        <img src="./media/LoadingIcon.svg" alt="Loading Icon" class="vertically-aligned-text">
+    </div>
 
-    <div id="temperature-values">
-        <div id="current-temperature" class="flex-child"> 
-            <h3 class="vertically-aligned-text">N/A</h3>
+    <div class="blur-filter">
+        <h1 id="header">RaspberryPi Dashboard</h1>
+
+        <div id="temperature-values" >
+            <div id="current-temperature" class="flex-child"> 
+                <h3 class="vertically-aligned-text">N/A</h3>
+            </div>
+
+            <div id="temperature-average" class="flex-child">
+                <h3 class="vertically-aligned-text">N/A</h3>
+            </div>
         </div>
 
-        <div id="temperature-average" class="flex-child">
+        <div id="temperature-status" class="neutral">
             <h3 class="vertically-aligned-text">N/A</h3>
         </div>
     </div>
-
-    <div id="temperature-status" class="neutral">
-        <h3 class="vertically-aligned-text">N/A</h3>
-    </div>
-    
 </body>
 
 </html>
