@@ -35,6 +35,14 @@ body{
   color: white;
 }
 
+.blur-filter{
+  filter: blur(10px);
+}
+
+.test-class{
+  background-color: red;
+}
+
 #loading-screen{
   background-color: rgba(207, 207, 207, 0.589);
   width: 100%;
@@ -49,9 +57,6 @@ body{
   align-items: center;
 }
 
-.blur-filter{
-  filter: blur(10px);
-}
 
 #header{
   text-align: center;
