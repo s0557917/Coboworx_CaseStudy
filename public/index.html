@@ -5,6 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300&display=swap" rel="stylesheet"> 
+        
     <script src="https://code.jquery.com/jquery-3.4.0.min.js" integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous" type="text/javascript" charset="utf-8"></script>
     <script src="js/raspberry-pi-dashboard.js" type="text/javascript" charset="utf-8"></script>
     <link href="css/style.css" rel="stylesheet" />
@@ -19,19 +23,26 @@
     </div>
 
     <div class="blur-filter">
-        <h1 id="header">RaspberryPi Dashboard</h1>
+        <h1 id="title">RaspberryPi Dashboard</h1>
 
         <div id="temperature-values" >
-            <div id="current-temperature" class="flex-child"> 
+
+            <div id="current-temperature" class="small-flex-child content-box"> 
+                <div class="icon-container">
+                    <img src="./media/ThermometerIcon.png" alt="Thermometer Icon">
+                </div>
                 <h3 class="vertically-aligned-text">N/A</h3>
             </div>
 
-            <div id="temperature-average" class="flex-child">
+            <div id="temperature-average" class="small-flex-child content-box">
+                <div class="icon-container">
+                    <img src="./media/AverageIcon.png" alt="Average Icon">
+                </div>
                 <h3 class="vertically-aligned-text">N/A</h3>
             </div>
         </div>
 
-        <div id="temperature-status" class="neutral">
+        <div id="temperature-status" class="content-box">
             <h3 class="vertically-aligned-text">N/A</h3>
         </div>
     </div>

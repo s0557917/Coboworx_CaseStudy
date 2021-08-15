@@ -32,7 +32,6 @@ $(document).ready(() =>
                 updateTemperatureStatus(currentTemperature);
                 updateTemperatureAverage(parseFloat(messageData.TemperatureAverage));
 
-                console.log(firstLoad);
                 if(firstLoad){
                     disableLoadingScreen();
                 }
