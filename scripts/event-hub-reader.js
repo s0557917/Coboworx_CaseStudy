@@ -2,7 +2,7 @@
  * Microsoft Sample Code - Copyright (c) 2020 - Licensed MIT
  */
 
-const { EventHubProducerClient, EventHubConsumerClient } = require('@azure/event-hubs');
+const { EventHubConsumerClient } = require('@azure/event-hubs');
 const { convertIotHubToEventHubsConnectionString } = require('./iot-hub-connection-string.js');
 
 class EventHubReader {
@@ -21,15 +21,15 @@ class EventHubReader {
       console.log('The partition ids are: ', partitionIds);
 
       consumerClient.subscribe({
-        processEvents: (events, context) => {
+        processEvents: (events) => {
           for (let i = 0; i < events.length; ++i) {
             startReadMessageCallback(
               events[i].body,
               events[i].enqueuedTimeUtc,
-              events[i].systemProperties["iothub-connection-device-id"]);
+              events[i].systemProperties['iothub-connection-device-id']);
           }
         },
-        processError: (err, context) => {
+        processError: (err) => {
           console.error(err.message || err);
         }
       });

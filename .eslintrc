@@ -34,10 +34,20 @@
     "brace-style": [
       "error",
       "1tbs"
+    ], 
+    "no-use-before-define": [
+      "error", {"functions": false}
     ]
   },
   "plugins": [
     "jsx-a11y",
     "import"
-  ]
+  ], 
+  "env": {
+    "browser": true,
+    "node": true, 
+    "commonjs": true,
+    "es6": true,
+    "jquery": true
+  }
 }

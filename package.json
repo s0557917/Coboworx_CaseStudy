@@ -7,7 +7,8 @@
     "npm": ">=6.0.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js", 
+    "lint": "eslint server.js public/js/*.js scripts/*.js"
   },
   "dependencies": {
     "@azure/event-hubs": ">=5.0.2",
@@ -18,7 +19,6 @@
     "eslint-config-airbnb": ">=18.0.1",
     "eslint-config-standard": ">=14.1.0",
     "eslint-plugin-import": ">=2.18.2",
-    "eslint-plugin-jsx-a11y": ">=6.2.3",
     "eslint-plugin-node": ">=9.2.0",
     "eslint-plugin-promise": ">=4.2.1",
     "eslint-plugin-react": ">=7.14.3",
@@ -29,5 +29,8 @@
     "rhea-promise": "^1.0.0",
     "tedious": "^11.4.0",
     "ws": ">=7.1.2"
+  },
+  "devDependencies": {
+    "eslint-plugin-jsx-a11y": "^6.4.1"
   }
 }
