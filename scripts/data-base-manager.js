@@ -27,7 +27,7 @@ async function runTelemetryInsertionQuery(timestamp, temperature)
         let pool = await sql.connect(sqlConfig);
         return pool.request()
         .input('timestamp', sql.DateTime2, timestamp)
-        .input('temperature', sql.Float, temperature)
+        .input('temperature', sql.Decimal(10, 5), temperature)
         .query(`INSERT INTO TelemetryData (Timestamp, Temperature) VALUES (@timestamp, @temperature)`);
     }
     catch (error)
@@ -41,7 +41,7 @@ async function runGetLatestTemperatureQuery()
     try
     {
         let pool = await sql.connect(sqlConfig);
-        return pool.request().query(`SELECT temperature FROM TelemetryData WHERE timestamp = (SELECT MAX(timestamp) FROM TelemetryData)`);
+        return pool.request().query(`SELECT Temperature FROM TelemetryData WHERE Timestamp = (SELECT MAX(Timestamp) FROM TelemetryData)`);
     }
     catch(error)
     {
@@ -54,7 +54,7 @@ async function runGetTemperatureAverageFromLastDay()
     try
     {
         let pool = await sql.connect(sqlConfig);
-        return pool.request().query(`SELECT temperature FROM TelemetryData WHERE timestamp >= DATEADD(day, -1, GETDATE())`);
+        return pool.request().query(`SELECT Temperature FROM TelemetryData WHERE Timestamp >= DATEADD(day, -1, GETDATE())`);
     }
     catch(error)
     {

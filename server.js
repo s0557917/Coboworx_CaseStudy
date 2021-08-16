@@ -4,7 +4,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const EventHubReader = require('./scripts/event-hub-reader.js');
-const { runGetLatestTemperatureQuery, runGetTemperatureAverageFromLastDay, runTelemetryInsertionQuery } = require('./scripts/data-base-manager.js')
+const { runGetLatestTemperatureQuery, runGetTemperatureAverageFromLastDay, runTelemetryInsertionQuery, getAll } = require('./scripts/data-base-manager.js')
 
 const iotHubConnectionString = process.env.IOT_HUB_CONNECTION_STRING;
 if (!iotHubConnectionString) 
@@ -64,7 +64,7 @@ wss.on('connection', function(ws, request){
   {
     try 
     {
-      runTelemetryInsertionQuery(date, parseFloat(message.temperature)).then(() => {
+      runTelemetryInsertionQuery(date, message.temperature).then(() => {
         getAndBroadcastTemperatureData();
       });
 
@@ -83,13 +83,13 @@ function getAndBroadcastTemperatureData()
 
   runGetLatestTemperatureQuery().then(value => 
   {
-    if(value)
+    if(value != undefined)
     {
-      latestTemperature = value.recordset[0].temperature;
+      latestTemperature = value.recordset[0].Temperature;
 
       runGetTemperatureAverageFromLastDay().then(value => 
       {
-        if(value)
+        if(value != undefined)
         {
           avgTemperature = calculateTemperatureAverage(value);
         }
@@ -97,7 +97,6 @@ function getAndBroadcastTemperatureData()
         {
           avgTemperature = null;
         }
-
         wss.broadcast(JSON.stringify
         (
           {
@@ -115,7 +114,7 @@ function calculateTemperatureAverage(temperatures)
   let average = 0;
   for(let i=0; i<temperatures.recordset.length; i++)
   {
-    average += temperatures.recordset[i].temperature;
+    average += temperatures.recordset[i].Temperature;
   }
   average = average / temperatures.recordset.length;
   return average;
